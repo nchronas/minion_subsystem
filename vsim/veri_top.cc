@@ -4,28 +4,22 @@
 #ifdef TRACE_VCD
  #include <verilated_vcd_c.h>
 #endif
-#include "Vchip_top.h"
+#include "Vminion_soc.h"
 #include "globals.h"
-#include "dpi_ram_behav.h"
 #include <string>
 #include <vector>
 #include <iostream>
 
-#include "GlipTcp.h"
-
 using std::string;
 using std::vector;
 
-Vchip_top *top;
+Vminion_soc *top;
 uint64_t max_time = 0;
 
 double sc_time_stamp() { return main_time; }
 
 int main(int argc, char** argv) {
   Verilated::commandArgs(argc, argv);
-
-  // initialize memory model
-  memory_model_init();
 
   // handle arguements
   bool vcd_enable = false;
@@ -36,10 +30,6 @@ int main(int argc, char** argv) {
   for(vector<string>::iterator it = args.begin(); it != args.end(); ++it) {
     if(*it == "+vcd")
       vcd_enable = true;
-    else if(it->find("+load=") == 0) {
-      string filename = it->substr(strlen("+load="));
-      memory_controller->load_mem(filename);
-    }
     else if(it->find("+max-cycles=") == 0) {
       max_time = 10 * strtoul(it->substr(strlen("+max-cycles=")).c_str(), NULL, 10);
     }
@@ -51,8 +41,8 @@ int main(int argc, char** argv) {
     }
   }
 
-  top = new Vchip_top;
-  top->rst_top = 1;
+  top = new Vminion_soc;
+  top->rstn = 1;
 
   // VCD dump
 #ifdef TRACE_VCD
@@ -65,29 +55,28 @@ int main(int argc, char** argv) {
 #endif
 
   top->eval();
-  
-  GlipTcp &glip = GlipTcp::instance();
+
   while(!Verilated::gotFinish() && (!exit_code || exit_delay > 1) &&
         (max_time == 0 || main_time < max_time) &&
         (exit_delay != 1)
         ) {
-    if (!glip.connected() && wait_debug) {
-      continue;
-    }
+
     if(main_time > 133) {
-      top->rst_top = 0;
+      top->rstn = 0;
     }
     if((main_time % 10) == 0) { // 10ns clk
-      top->clk_p = 1;
-      top->clk_n = 0;
+      top->pxl_clk = 1;
+      top->clk_200MHz = 1;
+      top->msoc_clk = 1;
     }
     if((main_time % 10) == 5) {
-      top->clk_p = 0;
-      top->clk_n = 1;
+      top->pxl_clk = 0;
+      top->clk_200MHz = 0;
+      top->msoc_clk = 0;
     }
 
     top->eval();
-    if((main_time % 10) == 0) memory_controller->step();
+
 #ifdef TRACE_VCD
     if(vcd_enable) vcd->dump(main_time);       // do the dump
 #endif
@@ -110,7 +99,6 @@ int main(int argc, char** argv) {
 #endif
 
   delete top;
-  memory_model_close();
 
   if(max_time == 0 || main_time < max_time)
     return exit_code;
