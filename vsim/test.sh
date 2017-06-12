@@ -47,7 +47,7 @@ verilator \
   --error-limit 500 \
     --output-split 80000 \
   --output-split-cfuncs 10000 \
-  -Wno-lint -Wno-style -Wno-STMTDLY -Wno-ASSIGNIN -Wno-fatal --coverage\
+  -Wno-lint -Wno-style -Wno-STMTDLY -Wno-ASSIGNIN -Wno-fatal --coverage --trace-max-array 17000 \
   -CFLAGS "-std=c++11" \
   -CFLAGS "-I/media/nanimo/lowRISC_repo/minion_subsystem/vsim" \
   -LDFLAGS "-pthread" \

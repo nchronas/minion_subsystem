@@ -24,21 +24,49 @@ module datamem(
        if (ena) begin
           if (wea) begin
               mem[addra] = dina & maska;
-              //$display("Clk: addr: %d en:  %d we:  %d din:  %d dout:  %d mask:  %d mem: ", addra, ena, wea, dina, douta, maska );
+              $display("Mem A ",
+                       "addr: %x ", addra,
+                         "en: %x ", ena,
+                         "we: %x ", wea,
+                        "din: %x ", dina,
+                       "dout: %x ", douta,
+                       "mask: %x ", maska,
+                        "mem: %x ", mem[addra]);
           end else begin
               douta = mem[addra] & maska;
-              //$display("Clk: addr: %d en:  %d we:  %d din:  %d dout:  %d mask:  %d mem: ", addra, ena, wea, dina, douta, maska );
-          end
+              $display("Mem A ",
+                       "addr: %x ", addra,
+                         "en: %x ", ena,
+                         "we: %x ", wea,
+                        "din: %x ", dina,
+                       "dout: %x ", douta,
+                       "mask: %x ", maska,
+                        "mem: %x ", mem[addra]);
+         end
        end
 
        maskb = { {8{enb[3]}}, {8{enb[2]}}, {8{enb[1]}}, {8{enb[0]}} };
        if (enb) begin
           if (web) begin
               mem[addrb] = dinb & maskb;
-              //$display("Clk: addr: %d en:  %d we:  %d din:  %d dout:  %d mask:  %d mem: ", addra, ena, wea, dina, douta, mask );
+              $display("Mem B ",
+                       "addr: %x ", addrb,
+                         "en: %x ", enb,
+                         "we: %x ", web,
+                        "din: %x ", dinb,
+                       "dout: %x ", doutb,
+                       "mask: %x ", maskb,
+                        "mem: %x ", mem[addrb]);
           end else begin
               doutb = mem[addrb] & maskb;
-              //$display("Clk: addr: %d en:  %d we:  %d din:  %d dout:  %d mask:  %d mem: ", addra, ena, wea, dina, douta, mask );
+              $display("Mem B ",
+                       "addr: %x ", addrb,
+                         "en: %x ", enb,
+                         "we: %x ", web,
+                        "din: %x ", dinb,
+                       "dout: %x ", doutb,
+                       "mask: %x ", maskb,
+                        "mem: %x ", mem[addrb]);
           end
        end
     end
@@ -64,15 +92,38 @@ module progmem(
     wire [31:0] maska, maskb;
 
     initial begin
-      mem[0] = 32'h00108093;
-      mem[1] = 32'h00000013;
-      mem[2] = 32'hffdff06f;
 
       mem[32] = 32'h00000013;
       mem[33] = 32'h00108093;
       mem[34] = 32'h00000013;
       mem[35] = 32'h00000013;
-      mem[36] = 32'hff1ff06f;
+      mem[36] = 32'h00000013;
+
+      mem[37] = 32'h07500313;
+      mem[38] = 32'h002003b7;
+      mem[39] = 32'h0063a023;
+
+      mem[40] = 32'h00000013;
+      mem[41] = 32'h00000013;
+      mem[42] = 32'h00000013;
+
+      mem[43] = 32'h001002b7;
+
+      mem[44] = 32'h0012a023;
+      mem[45] = 32'h00000013;
+
+      mem[46] = 32'h0002a103;
+      mem[47] = 32'h00000013;
+      mem[48] = 32'h0002a183;
+      mem[49] = 32'h00000013;
+      mem[50] = 32'h00218193;
+      mem[51] = 32'h00000013;
+      mem[52] = 32'h0032a023;
+      mem[53] = 32'h00000013;
+      mem[54] = 32'h00000013;
+      mem[55] = 32'hfbdff06f;
+
+//      mem[] = 32'h;
     end
 
     always @(posedge clk) begin
