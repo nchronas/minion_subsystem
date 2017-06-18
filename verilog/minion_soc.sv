@@ -17,30 +17,40 @@ module minion_soc
  output wire 	   uart_tx,
  input wire 	   uart_rx,
  // clock and reset
- input wire        clk_200MHz,
- input wire        pxl_clk,
- input wire 	   msoc_clk,
- input wire 	   rstn,
- output reg [7:0]  to_led,
- input wire [15:0] from_dip,
- output wire [31:0] 	   core_lsu_addr,
- output reg  [31:0] 	   core_lsu_addr_dly,
- output wire [31:0] 	   core_lsu_wdata,
- output wire [3:0] 	   core_lsu_be,
- output wire	   ce_d,
- output wire	   we_d,
- output wire	   shared_sel,
- input wire [31:0] 	   shared_rdata,
+ //input wire        clk_200MHz,
+ //input wire        pxl_clk,
+ input wire 	   clk_in1,
+ input wire 	   rstn,//,
+ output reg [7:0]  to_led
+ //input wire [15:0] from_dip,
+ //output wire [31:0] 	   core_lsu_addr,
+ //output reg  [31:0] 	   core_lsu_addr_dly,
+ //output wire [31:0] 	   core_lsu_wdata,
+ //output wire [3:0] 	   core_lsu_be,
+ //output wire	   ce_d,
+ //output wire	   we_d,
+ //output wire	   shared_sel,
+ //input wire [31:0] 	   shared_rdata,
  // pusb button array
- input wire GPIO_SW_C,
- input wire GPIO_SW_W,
- input wire GPIO_SW_E,
- input wire GPIO_SW_N,
- input wire GPIO_SW_S
+ //input wire GPIO_SW_C,
+ //input wire GPIO_SW_W,
+ //input wire GPIO_SW_E,
+ //input wire GPIO_SW_N,
+ //input wire GPIO_SW_S
 
  );
 
  wire [19:0] dummy;
+
+ wire 	   msoc_clk;
+ wire [31:0] 	   core_lsu_addr;
+ reg  [31:0] 	   core_lsu_addr_dly;
+ wire [31:0] 	   core_lsu_wdata;
+ wire [3:0] 	   core_lsu_be;
+ wire	   ce_d;
+ wire	   we_d;
+ wire	   shared_sel;
+ wire [31:0] 	   shared_rdata;
 
 //----------------------------------------------------------------------------//
 // Core Instantiation
@@ -175,7 +185,7 @@ datamem block_d (
 //----------------------------------------------------------------------------//
 
    logic 	ce_i;
-   logic        we_i;
+   logic  we_i;
 
 coremem coremem_i
 (
@@ -250,15 +260,14 @@ always @(posedge msoc_clk or negedge rstn)
 	u_recv <= 0;
 	core_lsu_addr_dly <= 0;
 	to_led <= 0;
-	u_baud <= 16'd87;
+	u_baud <= 16'd651;
 	u_trans <= 1'b0;
 	u_tx_byte <= 8'b0;
-    end
+	  end
    else
      begin
-	u_recv <= received;
+  u_recv <= received;
 	core_lsu_addr_dly <= core_lsu_addr;
-	if (core_lsu_req&core_lsu_we&one_hot_data_addr[6])
 	if (core_lsu_req&core_lsu_we&one_hot_data_addr[7])
 	  to_led <= core_lsu_wdata;
 	u_trans <= 1'b0;
@@ -285,6 +294,31 @@ my_fifo #(.width(9)) uart_rx_fifo (
   .almostfull(uart_almostfull),   // output wire almost full
   .full(uart_full),    // output wire full
   .empty(uart_empty)  // output wire empty
+);
+
+ clk_wiz_arty_0 my_clk_wiz
+ (// Clock in ports
+  .clk_in1(clk_in1),
+  // Clock out ports
+  .msoc_clk(msoc_clk)
+ );
+
+ila_arty_0 my_ila
+(
+.clk (msoc_clk),
+
+.probe0(core_instr_req),
+.probe1(core_instr_gnt),
+.probe2(core_instr_rvalid),
+.probe3(core_instr_addr),
+.probe4(core_instr_rdata),
+.probe5(rstn),
+.probe6(core_lsu_addr[23:20]),
+.probe7(u_trans),
+.probe8(u_tx_byte),
+.probe9(uart_tx),
+.probe10(u_baud),
+.probe11(core_lsu_wdata)
 );
 
 endmodule // chip_top
