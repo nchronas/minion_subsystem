@@ -329,10 +329,8 @@
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
       <Filter Type="Constrs"/>
-      <File Path="$PSRCDIR/constrs_1/imports/srcs/pin_plan_arty.xdc">
+      <File Path="$PPRDIR/srcs/pin_plan_arty.xdc">
         <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/srcs/pin_plan_arty.xdc"/>
-          <Attr Name="ImportTime" Val="1497691898"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>
