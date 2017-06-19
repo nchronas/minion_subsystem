@@ -1,14 +1,10 @@
-LDFLAGS=
-OBJECTS= #atmel_generic.o ihex.o srecord.o testGIS.o
-CFLAGS=-Wall -Wextra -g -m32 -march=IMXpulpv2 -Wa,-march=IMXpulpv2 -Wextra -Wall -Wno-unused-parameter -Wno-unused-function -fdata-sections -ffunction-sections # -fdiagnostics-color=always
-LFLAGS=-Tlink.common.ld -nostartfiles -Wl,--gc-sections -nostdlib
 
-O =  test_c.c minion.c utilities.c
+O =  test.asm
 
 all: clean target.elf
 
 target.elf: $O
-	riscv32-unknown-elf-gcc -O0 -nostdlib $(CFLAGS) -o $@ crt0.riscv.S $O $(LFLAGS)
+	riscv32-unknown-elf-as -march=IXpulpv2 -o $@ $O
 	riscv32-unknown-elf-size target.elf | tee target.size
 	riscv32-unknown-elf-nm target.elf >target.nm
 	riscv32-unknown-elf-objdump -d target.elf >target.dis

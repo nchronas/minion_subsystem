@@ -4,15 +4,13 @@
 #define ADD_UART_TX_STATUS 0x300000
 #define ADD_LED_OUT        0x700000
 
-
-
 void led_output(char val) {
-  unsigned char *led = (unsigned char *) ADD_LED_OUT;
+  volatile unsigned char *led = (unsigned char *) ADD_LED_OUT;
   *led = val;
 }
 
 int uart_transmit_status() {
-  unsigned int *status = (unsigned int *) ADD_LED_OUT;
+  volatile unsigned int *status = (unsigned int *) ADD_LED_OUT;
   if((*status & 0x400) == 0) {
     return UART_TX_IDLE;
   } else {
@@ -21,7 +19,7 @@ int uart_transmit_status() {
 }
 
 void uart_transmit_byte(char c) {
-  unsigned int *byte = (unsigned int *) ADD_UART_TX;
+  volatile unsigned int *byte = (unsigned int *) ADD_UART_TX;
   *byte = c;
 }
 
