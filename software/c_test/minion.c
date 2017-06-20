@@ -4,12 +4,15 @@
 #define ADD_UART_TX_STATUS 0x300000
 #define ADD_LED_OUT        0x700000
 
+#define SIM_DELAY 250
+#define REAL_DELAY 250000
+
 int init(int temp) {
   return temp + 1;
 }
 
 void delay() {
- long delay = 250000;
+ long delay = REAL_DELAY;
  for(long i = 0; i < delay; i++) {  }
 }
 

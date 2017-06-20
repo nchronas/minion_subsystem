@@ -18,12 +18,12 @@ _init:
 
 _print_str:
 
-    lw x8, mem1(x3)    # get uart availability
+    lw x8, 0(x3)    # get uart availability
     andi x8, x8, 0x400 # get is_trans flag
     bne x8, x0, _print_str
 
     lb x8, str(x1)   # get ascii char from array
-    sw x8, mem(x2)   # Tx byte
+    sw x8, 0(x2)   # Tx byte
 
     addi x1, x1, 1   # next char
     addi x5, x5, -1  # decrease char counter
@@ -33,8 +33,9 @@ _print_str:
 _loop:
     addi x7, x7, 1   # increase led counter
 
-    sw x7, mem(x4)   # led byte
-    lui x6, 0x262    # delay init
+    sw x7, 0(x4)   # led byte
+    lui x6, 0x262    # delay init real
+    #addi x6, x0, 0x65    # delay init sim
 
 _delay:
     addi x6, x6, -1  # --
@@ -45,5 +46,4 @@ _delay:
 .data 0x100000
 
             .align 3
-      str:  .ascii "Hello minion\n"
-      mem: .long 0
+      str:  .ascii "Hello minion\npad"
