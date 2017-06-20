@@ -269,11 +269,18 @@ always @(posedge msoc_clk or negedge rstn)
   u_recv <= received;
 	core_lsu_addr_dly <= core_lsu_addr;
 	if (core_lsu_req&core_lsu_we&one_hot_data_addr[7])
-	  to_led <= core_lsu_wdata;
-	u_trans <= 1'b0;
+    begin
+	    to_led <= core_lsu_wdata;
+      $display("Tx byte %x\n", core_lsu_wdata[7:0]);
+    end
+  u_trans <= 1'b0;
     if (core_lsu_req&core_lsu_we&one_hot_data_addr[2])
       case(core_lsu_addr[5:2])
-        0: begin u_trans <= 1'b1; u_tx_byte <= core_lsu_wdata[7:0]; end
+        0: begin
+             u_trans <= 1'b1;
+             u_tx_byte <= core_lsu_wdata[7:0];
+             $display("Tx byte %c\n", core_lsu_wdata[7:0]);
+           end
         1: u_baud <= core_lsu_wdata;
       endcase
      end
@@ -318,7 +325,9 @@ ila_arty_0 my_ila
 .probe8(u_tx_byte),
 .probe9(uart_tx),
 .probe10(u_baud),
-.probe11(core_lsu_wdata)
+.probe11(core_lsu_wdata),
+.probe12(core_lsu_req&core_lsu_we&one_hot_data_addr[2]),
+.probe13(core_lsu_addr[5:2])
 );
 
 endmodule // chip_top
