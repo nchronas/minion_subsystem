@@ -4,7 +4,9 @@
 #define UART_TX_IDLE     0
 #define UART_TX_TRANSMIT 1
 
-//void delay_ms(int sleep);
+int init(int temp);
+
+void delay();
 
 void led_output(char val);
 

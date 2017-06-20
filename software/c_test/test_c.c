@@ -1,16 +1,12 @@
-
 #include "minion.h"
 
-char str[] = "Hello minion\n";
-
-void delay_ms(int sleep) {
- //long delay = ((float)sleep / 0.00024);
-long delay = 250000;
- for(long i = 0; i < delay; i++) {  }
-}
+int temp[20] = { 10 } ;
 
 int main() {
 
+  init(temp[0]);
+
+  char str[] = "Hello minion\n";
   uart_transmit(str, 13);
 
   char i = 0;
@@ -18,6 +14,6 @@ int main() {
   while(1) {
     i++;
     led_output(i);
-    delay_ms(500);
+    delay();
   }
 }
