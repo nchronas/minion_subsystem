@@ -25,7 +25,7 @@ module coremem
    input logic  data_we_i,
    output logic CE, WE
    );
-   
+
    logic        aw_valid_o;
    logic        aw_ready_i;
    logic        w_valid_o;
@@ -44,7 +44,7 @@ module coremem
    assign aw_ready_i = 1'b1;
    assign ar_ready_i = 1'b1;
    assign w_ready_i = 1'b1;
-   
+
    // main FSM
    always_comb
      begin
@@ -67,72 +67,30 @@ module coremem
                begin
                   // send address over aw channel for writes,
                   // over ar channels for reads
+                  data_gnt_o = 1'b1;
                   if (data_we_i)
                     begin
                        aw_valid_o = 1'b1;
-                       w_valid_o  = 1'b1;
+                       NS = WRITE_WAIT;
 
-                       if (aw_ready_i) begin
-                          if (w_ready_i) begin
-                             data_gnt_o = 1'b1;
-                             NS = WRITE_WAIT;
-                          end else begin
-                             NS = WRITE_DATA;
-                          end
-                       end else begin
-                          if (w_ready_i) begin
-                             NS = WRITE_ADDR;
-                          end else begin
-                             NS = IDLE;
-                          end
-                       end
+
                     end else begin
                        ar_valid_o = 1'b1;
+                       NS = READ_WAIT;
 
-                       if (ar_ready_i) begin
-                          data_gnt_o = 1'b1;
-                          NS = READ_WAIT;
-                       end else begin
-                          NS = IDLE;
-                       end
                     end
                end else begin
                   NS = IDLE;
                end
           end
 
-          // if the bus has not accepted our write data right away, but has
-          // accepted the address already
-          WRITE_DATA: begin
-             w_valid_o = 1'b1;
-             if (w_ready_i) begin
-                data_gnt_o = 1'b1;
-                NS = WRITE_WAIT;
-             end
-          end
-
-          // the bus has accepted the write data, but not yet the address
-          // this happens very seldom, but we still have to deal with the
-          // situation
-          WRITE_ADDR: begin
-             aw_valid_o = 1'b1;
-
-             if (aw_ready_i) begin
-                data_gnt_o = 1'b1;
-                NS = WRITE_WAIT;
-             end
-          end
-
           // we have sent the address and data and just wait for the write data to
           // be done
           WRITE_WAIT:
             begin
-               b_ready_o = 1'b1;
-
                if (b_valid_i)
                  begin
                     data_rvalid_o = 1'b1;
-
                     NS = IDLE;
                  end
             end
@@ -143,8 +101,6 @@ module coremem
                if (r_valid_i)
                  begin
                     data_rvalid_o     = 1'b1;
-                    r_ready_o = 1'b1;
-
                     NS = IDLE;
                  end
             end
@@ -169,7 +125,7 @@ module coremem
           begin
              CS     <= NS;
              r_valid_i <= data_gnt_o && ar_valid_o;
-             b_valid_i <= data_gnt_o && w_valid_o;
+             b_valid_i <= data_gnt_o && aw_valid_o;
           end
      end
 

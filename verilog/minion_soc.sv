@@ -88,17 +88,6 @@ logic [31:0]  core_lsu_rdata;
 
   assign shared_sel = one_hot_data_addr[8];
 
-always_comb
-  begin:onehot
-     integer i;
-     core_lsu_rdata = 32'b0;
-     for (i = 0; i < 16; i++)
-       begin
-	  one_hot_data_addr[i] = core_lsu_addr[23:20] == i;
-	  core_lsu_rdata |= (one_hot_data_addr[i] ? one_hot_rdata[i] : 32'b0);
-       end
-  end
-
 riscv_core
 #(
   .N_EXT_PERF_COUNTERS ( 0 )
@@ -150,32 +139,43 @@ RISCV_CORE
   .ext_perf_counters_i (  2'b0         )
 );
 
+memconfig memmux {
+  //from core lsu
+  .core_lsu_addr(core_lsu_addr) ,
+  .core_lsu_wdata(core_lsu_wdata) ,
+  .core_lsu_we(core_lsu_we) ,
+  .core_lsu_req(core_lsu_req) ,
+  .core_lsu_be(core_lsu_be) ,
+  core_lsu_rdata(core_lsu_rdata) ,
+  .core_lsu_gnt(core_lsu_gnt) ,
+  .core_lsu_rvalid(core_lsu_rvalid) ,
+
+  //minion bus to peripherals
+  .bus_addr(minion_bus_addr),
+
+  //bus enable
+  .bus_ce(minion_bus_ce),
+  .bus_we(minion_bus_we),
+
+  .bus_read(minion_bus_read),
+  .bus_write(minion_bus_write)
+
+}
+
 //----------------------------------------------------------------------------//
 // Data RAM
 //----------------------------------------------------------------------------//
 
-coremem coremem_d
-(
- .clk_i(msoc_clk),
- .rst_ni(rstn),
- .data_req_i(core_lsu_req),
- .data_gnt_o(core_lsu_gnt),
- .data_rvalid_o(core_lsu_rvalid),
- .data_we_i(core_lsu_we),
- .CE(ce_d),
- .WE(we_d)
- );
-
 datamem block_d (
   .clk(msoc_clk),
-  .wea(ce_d & one_hot_data_addr[1] & we_d),
-  .ena(we_d ? core_lsu_be : 4'b1111),
-  .addra(core_lsu_addr[15:2]),
+  .wea(minion_bus_we[BLOCK_D]),
+  .ena(minion_bus_we[BLOCK_D] ? core_lsu_be : 4'b1111),
+  .addra(minion_bus_addr[15:2]),
   .dina(core_lsu_wdata),
-  .douta(one_hot_rdata[1]),
+  .douta(minion_bus_read[block_d_rdata_addr]),
   .web(1'b0),
   .enb(4'b0000),
-  .addrb(core_lsu_addr[15:2]),
+  .addrb(minion_bus_addr[15:2]),
   .dinb(core_lsu_wdata),
   .doutb()
  );
@@ -183,21 +183,20 @@ datamem block_d (
 //----------------------------------------------------------------------------//
 // Instruction RAM
 //----------------------------------------------------------------------------//
-
    logic 	ce_i;
    logic  we_i;
 
-coremem coremem_i
-(
- .clk_i(msoc_clk),
- .rst_ni(rstn),
- .data_req_i(core_instr_req),
- .data_gnt_o(core_instr_gnt),
- .data_rvalid_o(core_instr_rvalid),
- .data_we_i(1'b0),
- .CE(ce_i),
- .WE(we_i)
- );
+   coremem coremem_i
+   (
+    .clk_i(msoc_clk),
+    .rst_ni(rstn),
+    .data_req_i(core_instr_req),
+    .data_gnt_o(core_instr_gnt),
+    .data_rvalid_o(core_instr_rvalid),
+    .data_we_i(1'b0),
+    .CE(ce_i),
+    .WE(we_i)
+    );
 
 progmem block_i (
     .clk(msoc_clk),
@@ -206,11 +205,11 @@ progmem block_i (
     .addra(core_instr_addr[15:2]),
     .dina(32'b0),
     .douta(core_instr_rdata),
-    .web(ce_d & one_hot_data_addr[0] & we_d),
-    .enb(we_d ? core_lsu_be : 4'b1111),
-    .addrb(core_lsu_addr[15:2]),
+    .web(minion_bus_we[BLOCK_I]),
+    .enb(minion_bus_we[BLOCK_I] ? core_lsu_be : 4'b1111),
+    .addrb(minion_bus_addr[15:2]),
     .dinb(core_lsu_wdata),
-    .doutb(one_hot_rdata[0])
+    .doutb(minion_bus_read[block_i_rdata_addr])
    );
 
   //////////////////////////////////////////////////////////////////
@@ -219,89 +218,45 @@ progmem block_i (
   ///                                                            ///
   //////////////////////////////////////////////////////////////////
 
-reg u_trans;
-reg u_recv;
-reg [15:0] u_baud;
-wire received, recv_err, is_recv, is_trans, uart_maj;
-wire uart_almostfull, uart_full, uart_rderr, uart_wrerr, uart_empty;
-wire [11:0] uart_wrcount, uart_rdcount;
-wire [8:0] uart_fifo_data_out;
-reg  [7:0] u_tx_byte;
+leds my_leds
+  (
+   // Clock and Reset
+   .clk(msoc_clk),
+   .rst(!rstn),
 
-rx_delay uart_rx_dly(
-.clk(msoc_clk),
-.in(uart_rx),
-.maj(uart_maj));
+   //I/O wires to pins
+   .leds(to_led),
 
-uart i_uart(
-    .clk(msoc_clk), // The master clock for this module
-    .rst(~rstn), // Synchronous reset.
-    .rx(uart_maj), // Incoming serial line
-    .tx(uart_tx), // Outgoing serial line
-    .transmit(u_trans), // Signal to transmit
-    .tx_byte(u_tx_byte), // Byte to transmit
-    .received(received), // Indicated that a byte has been received.
-    .rx_byte(core_lsu_rx_byte), // Byte received
-    .is_receiving(is_recv), // Low when receive line is idle.
-    .is_transmitting(is_trans), // Low when transmit line is idle.
-    .recv_error(recv_err), // Indicates error in receiving packet.
-    .baud(u_baud),
-    .recv_ack(u_recv)
-    );
+   //bus SFR enable
+   .bus_re(minion_bus_ce[LEDS_CE]),
+   .bus_we(minion_bus_we[LEDS_WE]),
+   .bus_addr(minion_bus_addr),
 
-assign one_hot_rdata[3] = {uart_wrcount,uart_almostfull,uart_full,uart_rderr,uart_wrerr,uart_fifo_data_out[8],is_trans,is_recv,~uart_empty,uart_fifo_data_out[7:0]};
+   //
+   .bus_read(minion_bus_read[LEDS_READ]),
+   .bus_write(core_lsu_wdata)
+   );
 
-   wire    tx_rd_fifo;
-   wire    rx_wr_fifo;
+  uart my_uart
+     (
+      // Clock and Reset
+      .clk(msoc_clk),
+      .rst(!rstn),
 
-always @(posedge msoc_clk or negedge rstn)
-  if (!rstn)
-    begin
-	u_recv <= 0;
-	core_lsu_addr_dly <= 0;
-	to_led <= 0;
-	u_baud <= 16'd651;
-	u_trans <= 1'b0;
-	u_tx_byte <= 8'b0;
-	  end
-   else
-     begin
-  u_recv <= received;
-	core_lsu_addr_dly <= core_lsu_addr;
-	if (core_lsu_req&core_lsu_we&one_hot_data_addr[7])
-    begin
-	    to_led <= core_lsu_wdata;
-      $display("Tx byte %x\n", core_lsu_wdata[7:0]);
-    end
-  u_trans <= 1'b0;
-    if (core_lsu_req&core_lsu_we&one_hot_data_addr[2])
-      case(core_lsu_addr[5:2])
-        0: begin
-             u_trans <= 1'b1;
-             u_tx_byte <= core_lsu_wdata[7:0];
-             $display("Tx byte %c\n", core_lsu_wdata[7:0]);
-           end
-        1: u_baud <= core_lsu_wdata;
-      endcase
-     end
+      //I/O wires to pins
+      .uart_tx(uart_tx),
+      .uart_rx(uart_rx),
 
+      //bus SFR enable
+      .bus_re(minion_bus_re[UART_CE]),
+      .bus_we(minion_bus_we[UART_WE]),
+      .bus_addr(minion_bus_addr),
 
-my_fifo #(.width(9)) uart_rx_fifo (
-  .rd_clk(~msoc_clk),      // input wire read clk
-  .wr_clk(~msoc_clk),      // input wire write clk
-  .rst(~rstn),      // input wire rst
-  .din({recv_err,core_lsu_rx_byte}),      // input wire [width-1 : 0] din
-  .wr_en(received&&!u_recv),  // input wire wr_en
-  .rd_en(core_lsu_req&core_lsu_we&one_hot_data_addr[3]),  // input wire rd_en
-  .dout(uart_fifo_data_out),    // output wire [width-1 : 0] dout
-  .rdcount(uart_rdcount),         // 12-bit output: Read count
-  .rderr(uart_rderr),             // 1-bit output: Read error
-  .wrcount(uart_wrcount),         // 12-bit output: Write count
-  .wrerr(uart_wrerr),             // 1-bit output: Write error
-  .almostfull(uart_almostfull),   // output wire almost full
-  .full(uart_full),    // output wire full
-  .empty(uart_empty)  // output wire empty
-);
+      //
+      .bus_read(minion_bus_read[UART_READ]),
+      .bus_write(minion_bus_write)
+
+      );
 
  clk_wiz_arty_0 my_clk_wiz
  (// Clock in ports
