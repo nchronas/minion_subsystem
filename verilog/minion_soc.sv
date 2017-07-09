@@ -99,7 +99,7 @@ always_comb
        end
   end
 
-riscv_core
+riscv_core_cls
 #(
   .N_EXT_PERF_COUNTERS ( 0 )
 )
