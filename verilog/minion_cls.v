@@ -1,7 +1,7 @@
 
 `include "riscv_config.sv"
 
-import riscv_defines::*;
+//import riscv_defines::*;
 
 module riscv_core_cls
 #(
@@ -10,8 +10,8 @@ module riscv_core_cls
 )
 (
   // Clock and Reset
-  input  logic        clk,
-  input  logic        rst,
+  input  logic        clk_i,
+  input  logic        rst_ni,
 
   input  logic        clock_en_i,    // enable clock, otherwise it is gated
   input  logic        test_en_i,     // enable all clock gates for testing
@@ -63,39 +63,39 @@ module riscv_core_cls
 
 //Core slave 1
 // Instruction memory interface
-logic        instr_req_o_cls1;
-logic [31:0] instr_addr_o_cls1;
+wire        instr_req_o_cls1;
+wire [31:0] instr_addr_o_cls1;
 
 // Data memory interface
-logic        data_req_o_cls1;
-logic        data_we_o_cls1;
-logic [3:0]  data_be_o_cls1;
-logic [31:0] data_addr_o_cls1;
-logic [31:0] data_wdata_o_cls1;
+wire        data_req_o_cls1;
+wire        data_we_o_cls1;
+wire [3:0]  data_be_o_cls1;
+wire [31:0] data_addr_o_cls1;
+wire [31:0] data_wdata_o_cls1;
 
 // CPU Control Signals
-logic        core_busy_o_cls1;
+wire        core_busy_o_cls1;
 
 //Core slave 2
 // Instruction memory interface
-logic        instr_req_o_cls2;
-logic [31:0] instr_addr_o_cls2;
+wire        instr_req_o_cls2;
+wire [31:0] instr_addr_o_cls2;
 
 // Data memory interface
-logic        data_req_o_cls2;
-logic        data_we_o_cls2;
-logic [3:0]  data_be_o_cls2;
-logic [31:0] data_addr_o_cls2;
-logic [31:0] data_wdata_o_cls2;
+wire        data_req_o_cls2;
+wire        data_we_o_cls2;
+wire [3:0]  data_be_o_cls2;
+wire [31:0] data_addr_o_cls2;
+wire [31:0] data_wdata_o_cls2;
 
 // CPU Control Signals
-logic        core_busy_o_cls2;
+wire        core_busy_o_cls2;
 
-riscv_core_0
+riscv_core
 #(
   .N_EXT_PERF_COUNTERS ( 0 )
 )
-RISCV_CORE
+RISCV_CORE_master
 (
   .clk_i           ( clk_i             ),
   .rst_ni          ( rst_ni            ),
@@ -142,11 +142,11 @@ RISCV_CORE
   .ext_perf_counters_i ( ext_perf_counters_i )
 );
 
-riscv_core_slave_1
+riscv_core
 #(
   .N_EXT_PERF_COUNTERS ( 0 )
 )
-RISCV_CORE
+RISCV_CORE_slave_1
 (
   .clk_i           ( clk_i             ),
   .rst_ni          ( rst_ni            ),
@@ -193,11 +193,11 @@ RISCV_CORE
   .ext_perf_counters_i ( ext_perf_counters_i )
 );
 
-riscv_core_slave_2
+riscv_core
 #(
   .N_EXT_PERF_COUNTERS ( 0 )
 )
-RISCV_CORE
+RISCV_CORE_slave_2
 (
   .clk_i           ( clk_i             ),
   .rst_ni          ( rst_ni            ),
@@ -244,38 +244,50 @@ RISCV_CORE
   .ext_perf_counters_i ( ext_perf_counters_i )
 );
 
-cls_cmp_unit {
-  .clk( clk ),
-  .res( res ),
+cls_cmp_unit cls_assist (
+  .clk(clk_i),
+  .rst(rst_ni),
 
-  .fault (),
+  .fault(),
 
-  . (instr_req_o_cls1),
-  . (instr_addr_o_cls1),
-  . (data_req_o_cls1),
-  . (data_we_o_cls1),
-  . (data_be_o_cls1),
-  . (data_addr_o_cls1),
-  . (data_wdata_o_cls1),
-  . (core_busy_o_cls1),
+  .instr_req_ms(instr_req_o),
+  .instr_addr_ms(instr_addr_o),
 
-  . (instr_req_o_cls2),
-  . (instr_addr_o_cls2),
-  . (data_req_o_cls2),
-  . (data_we_o_cls2),
-  . (data_be_o_cls2),
-  . (data_addr_o_cls2),
-  . (data_wdata_o_cls2),
-  . (core_busy_o_cls2),
-};
+  .data_req_ms(data_req_o),
+  .data_we_ms(data_we_o),
+  .data_be_ms(data_be_o),
+  .data_addr_ms(data_addr_o),
+  .data_wdata_ms(data_wdata_o),
+  .core_busy_ms(core_busy_o),
 
-cls_handler_unit {
-    .clk( clk ),
-    .res_i( res ),
+  .instr_req_sl1(instr_req_o_cls1),
+  .instr_addr_sl1(instr_addr_o_cls1),
 
-    .res_o( rst_ni ),
+  .data_req_sl1(data_req_o_cls1),
+  .data_we_sl1(data_we_o_cls1),
+  .data_be_sl1(data_be_o_cls1),
+  .data_addr_sl1(data_addr_o_cls1),
+  .data_wdata_sl1(data_wdata_o_cls1),
+  .core_busy_sl1(core_busy_o_cls1),
 
-    .fault ()
-};
+  .instr_req_sl2(instr_req_o_cls2),
+  .instr_addr_sl2(instr_addr_o_cls2),
+
+  .data_req_sl2(data_req_o_cls2),
+  .data_we_sl2(data_we_o_cls2),
+  .data_be_sl2(data_be_o_cls2),
+  .data_addr_sl2(data_addr_o_cls2),
+  .data_wdata_sl2(data_wdata_o_cls2),
+  .core_busy_sl2(core_busy_o_cls2)
+);
+
+//cls_handler_unit {
+//    .clk( clk ),
+//    .res_i( res ),
+
+//    .res_o( rst_ni ),
+
+//    .fault ()
+//};
 
 endmodule

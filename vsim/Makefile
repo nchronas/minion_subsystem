@@ -28,6 +28,8 @@ verilog_srcs = \
 	../verilog/rambyte.v \
 	../verilog/rx_delay.v \
 	../verilog/uart.v \
+	../verilog/minion_cls.v \
+	../verilog/cls_unit.v \
 	../pulpino/ips/riscv/include/riscv_defines.sv \
 	../pulpino/ips/riscv/controller.sv \
 	../pulpino/ips/riscv/cs_registers.sv \
