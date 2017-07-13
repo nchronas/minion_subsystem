@@ -30,6 +30,7 @@ verilog_srcs = \
 	../verilog/uart.v \
 	../verilog/minion_cls.v \
 	../verilog/cls_unit.v \
+	../verilog/fault_injection.v \
 	../pulpino/ips/riscv/include/riscv_defines.sv \
 	../pulpino/ips/riscv/controller.sv \
 	../pulpino/ips/riscv/cs_registers.sv \

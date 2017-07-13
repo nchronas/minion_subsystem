@@ -244,6 +244,53 @@ RISCV_CORE_slave_2
   .ext_perf_counters_i ( ext_perf_counters_i )
 );
 
+//------------------------------------------------------------------------------
+//
+// fault injection unit
+//
+//------------------------------------------------------------------------------
+
+reg finj_fault;
+reg finj_index;
+
+assign {instr_req_o_cls1,
+        instr_addr_o_cls1,
+        data_req_o_cls1,
+        data_we_o_cls1,
+        data_be_o_cls1,
+        data_addr_o_cls1,
+        data_wdata_o_cls1,
+        instr_req_o_cls2,
+        instr_addr_o_cls2,
+        data_req_o_cls2,
+        data_we_o_cls2,
+        data_be_o_cls2,
+        data_addr_o_cls2,
+        data_wdata_o_cls2} = {instr_req_o_cls1,
+                              instr_addr_o_cls1,
+                              data_req_o_cls1,
+                              data_we_o_cls1,
+                              data_be_o_cls1,
+                              data_addr_o_cls1,
+                              data_wdata_o_cls1,
+                              instr_req_o_cls2,
+                              instr_addr_o_cls2,
+                              data_req_o_cls2,
+                              data_we_o_cls2,
+                              data_be_o_cls2,
+                              data_addr_o_cls2,
+                              data_wdata_o_cls2} ^ (finj_fault << finj_index);
+
+pseudo_random_gen cls_random_finj (
+  .clk(clk_i),
+  .rst(rst_ni),
+
+  .fault(finj_fault),
+  .index(finj_index)
+);
+
+//------------------------------------------------------------------------------
+
 cls_cmp_unit cls_assist (
   .clk(clk_i),
   .rst(rst_ni),
