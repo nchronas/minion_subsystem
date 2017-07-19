@@ -50,31 +50,40 @@ module cls_cmp_unit
   input  logic        core_busy_sl2
 );
 
+wire [2:0] core_instr_req;
+wire [2:0] core_data_req;
+wire [2:0] core_data_we;
+
+assign core_instr_req = { instr_req_ms, instr_req_sl1, instr_req_sl2 };
+assign core_data_req  = { data_req_ms, data_req_sl1, data_req_sl2 };
+assign core_data_we   = { data_we_ms, data_we_sl1, data_we_sl2 };
+
 always @(posedge clk or negedge rst)
   if (!rst) begin
 	   fault <= 0;
 	end else begin
-    if(instr_req_ms == 1 || instr_req_sl2 == 1 || instr_req_sl2 == 1) begin
-      if(instr_req_ms == instr_req_sl1 && instr_req_ms == instr_req_sl2) begin
-        if(instr_addr_ms == instr_addr_sl1 && instr_addr_ms == instr_addr_sl2) begin
-          fault <= 0;
-          //$display("Valid instruction address\n");
+    if(core_instr_req != 0 || core_data_req != 0) begin
+      if(core_instr_req != 0) begin
+        if(core_instr_req == 3'b111) begin
+          if(instr_addr_ms == instr_addr_sl1 && instr_addr_ms == instr_addr_sl2) begin
+            fault <= 0;
+            //$display("Valid instruction address\n");
+          end else begin
+            fault <= 1;
+            $display("Error in instruction address\n");
+          end
         end else begin
           fault <= 1;
-          $display("Error in instruction address\n");
+          $display("Error in instruction req\n");
         end
-      end else begin
-        fault <= 1;
-        $display("Error in instruction req\n");
       end
-    end else if (data_req_ms == 1 || data_req_sl2 == 1 || data_req_sl2 == 1) begin
-      if(data_req_ms == 1 && data_req_sl1 == 1 && data_req_sl2 == 1) begin
-        if(data_addr_ms == data_addr_sl1 && data_addr_ms == data_addr_sl2) begin
-          if(data_we_ms == data_we_sl1 && data_we_ms == data_we_sl2) begin
-            if(data_we_ms == 0) begin //read
-              fault <= 0;
-              //$display("Valid data read\n");
-            end else begin
+      if(core_data_req != 0) begin
+        if(core_data_req == 3'b111) begin
+          if(data_addr_ms == data_addr_sl1 && data_addr_ms == data_addr_sl2) begin
+            if(core_data_we == 3'b000) begin //read
+                fault <= 0;
+                //$display("Valid data read\n");
+            end else if(core_data_we == 3'b111) begin
               if(data_wdata_ms == data_wdata_sl1 && data_wdata_ms == data_wdata_sl2) begin
                 fault <= 0;
                 //$display("Valid data write\n");
@@ -82,18 +91,18 @@ always @(posedge clk or negedge rst)
                 fault <= 1;
                 $display("Error in data write\n");
               end
+            end else begin
+              fault <= 1;
+              $display("Error in data we\n");
             end
           end else begin
             fault <= 1;
-            $display("Error in data we\n");
+            $display("Error in data address\n");
           end
         end else begin
           fault <= 1;
-          $display("Error in data address\n");
+          $display("Error in data req\n");
         end
-      end else begin
-        fault <= 1;
-        $display("Error in data req\n");
       end
     end else begin
       fault <= 0;
