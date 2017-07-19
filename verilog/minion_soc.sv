@@ -21,7 +21,7 @@ module minion_soc
  //input wire        pxl_clk,
  input wire 	   clk_in1,
  input wire 	   rstn,//,
- output reg [7:0]  to_led
+ output reg [7:0]  to_led,
  //input wire [15:0] from_dip,
  //output wire [31:0] 	   core_lsu_addr,
  //output reg  [31:0] 	   core_lsu_addr_dly,
@@ -37,6 +37,9 @@ module minion_soc
  //input wire GPIO_SW_E,
  //input wire GPIO_SW_N,
  //input wire GPIO_SW_S
+
+ input  logic       finj_fault,
+ input  logic [9:0] finj_index
 
  );
 
@@ -147,7 +150,9 @@ RISCV_CORE
   .fetch_enable_i  ( fetch_enable_i    ),
   .core_busy_o     ( core_busy_o       ),
 
-  .ext_perf_counters_i (  2'b0         )
+  .ext_perf_counters_i (  2'b0         ),
+  .finj_fault(finj_fault),
+  .finj_index(finj_index)
 );
 
 //----------------------------------------------------------------------------//

@@ -11,11 +11,17 @@
 using std::string;
 using std::vector;
 
+#define MAX_FTIME 100000
+#define MIN_FTIME    100
+
 uint64_t main_time = 0;
 unsigned int exit_delay = 0;
 unsigned int exit_code = 0;
 
 uint64_t max_time = 0;
+
+uint64_t randFaultTime = 0;
+int f_flag = 0;
 
 double sc_time_stamp() { return main_time; }
 
@@ -26,7 +32,7 @@ void exit_function(int signal) {
 int main(int argc, char** argv) {
     Verilated::commandArgs(argc, argv);
 
-   signal(SIGINT, exit_function);
+    signal(SIGINT, exit_function);
 
     // handle arguements
     bool vcd_enable = false;
@@ -45,9 +51,14 @@ int main(int argc, char** argv) {
       }
     }
 
+    cout<<"Starting simulation"<<endl;
+
     // init top verilog instance
     Vminion_soc* top = new Vminion_soc;
     top->rstn = 0;
+
+    top->finj_fault = 0;
+    top->finj_index = 0;
 
   // VCD dump
   #ifdef VM_TRACE
@@ -61,6 +72,10 @@ int main(int argc, char** argv) {
 
     top->eval();
 
+
+    randFaultTime = rand()%(MAX_FTIME-MIN_FTIME + 1) + MIN_FTIME;
+    cout<<"Next fault in "<<randFaultTime<<endl;
+
     while(!Verilated::gotFinish() && (!exit_code || exit_delay > 1) &&
           (max_time == 0 || main_time < max_time) &&
           (exit_delay != 1)
@@ -71,6 +86,14 @@ int main(int argc, char** argv) {
       }
       if((main_time % 10) == 0) { // 10ns clk
         top->clk_in1 = 1;
+        if(f_flag == 2) {
+          top->finj_fault = 1;
+          f_flag = 1;
+        } else if(f_flag == 1) {
+          top->finj_fault = 0;
+          top->finj_index = 0;
+          f_flag = 0;
+        }
       }
       if((main_time % 10) == 5) {
         top->clk_in1 = 0;
@@ -92,6 +115,35 @@ int main(int argc, char** argv) {
 
       if((main_time % 10000000) == 0)
         std::cerr << "simulation has run for " << main_time/10 << " cycles..." << std::endl;
+
+      if(randFaultTime < main_time) {
+        signed int findex;
+
+        randFaultTime = rand()%(MAX_FTIME-MIN_FTIME + 1) + MIN_FTIME;
+        randFaultTime += main_time;
+
+        cout<<"Fault injected? just give index ";
+        cin>>findex;
+        if(findex == -1) {
+          cout<<"No fault injection for this cycle"<<endl;
+        } else if (findex == -2) {
+          exit_delay = 100;
+          cout<<"Exiting"<<endl;
+        } else if (findex == -3) {
+          randFaultTime = 10000000;
+          cout<<"No fault injection anymore"<<endl;
+        } else {
+          int fwire;
+          cout<<"Wire please: ";
+          cin>>fwire;
+          top->finj_index = (findex << 5 ) | fwire;
+          f_flag = 2;
+          cout<<"Fault injection at index "<<findex<<endl;
+        }
+
+        cout<<"Next fault in "<<randFaultTime<<endl;
+
+      }
     }
 
     top->final();

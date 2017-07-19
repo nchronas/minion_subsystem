@@ -58,7 +58,10 @@ module riscv_core_cls
   input  logic        fetch_enable_i,
   output logic        core_busy_o,
 
-  input  logic [N_EXT_PERF_COUNTERS-1:0] ext_perf_counters_i
+  input  logic [N_EXT_PERF_COUNTERS-1:0] ext_perf_counters_i,
+
+  input  logic       finj_fault,
+  input  logic [9:0] finj_index
 );
 
 //Core slave 1
@@ -68,7 +71,7 @@ wire [31:0] instr_addr_o_cls1;
 
 // Data memory interface
 wire        data_req_o_cls1;
-wire        data_we_o_cls1;
+logic       data_we_o_cls1;
 wire [3:0]  data_be_o_cls1;
 wire [31:0] data_addr_o_cls1;
 wire [31:0] data_wdata_o_cls1;
@@ -83,7 +86,7 @@ wire [31:0] instr_addr_o_cls2;
 
 // Data memory interface
 wire        data_req_o_cls2;
-wire        data_we_o_cls2;
+logic       data_we_o_cls2;
 wire [3:0]  data_be_o_cls2;
 wire [31:0] data_addr_o_cls2;
 wire [31:0] data_wdata_o_cls2;
@@ -250,44 +253,77 @@ RISCV_CORE_slave_2
 //
 //------------------------------------------------------------------------------
 
-reg finj_fault;
-reg finj_index;
+//wire       finj_fault;
+//wire [7:0] finj_index;
 
-assign {instr_req_o_cls1,
-        instr_addr_o_cls1,
-        data_req_o_cls1,
-        data_we_o_cls1,
-        data_be_o_cls1,
-        data_addr_o_cls1,
-        data_wdata_o_cls1,
-        instr_req_o_cls2,
-        instr_addr_o_cls2,
-        data_req_o_cls2,
-        data_we_o_cls2,
-        data_be_o_cls2,
-        data_addr_o_cls2,
-        data_wdata_o_cls2} = {instr_req_o_cls1,
-                              instr_addr_o_cls1,
-                              data_req_o_cls1,
-                              data_we_o_cls1,
-                              data_be_o_cls1,
-                              data_addr_o_cls1,
-                              data_wdata_o_cls1,
-                              instr_req_o_cls2,
-                              instr_addr_o_cls2,
-                              data_req_o_cls2,
-                              data_we_o_cls2,
-                              data_be_o_cls2,
-                              data_addr_o_cls2,
-                              data_wdata_o_cls2} ^ (finj_fault << finj_index);
+always_comb begin
+  case(finj_index[4:0])
+    1: begin
+        instr_req_o_cls1 ^= finj_fault;
+        $display("Tx byte %c\n", finj_index[4:0]);
+       end
+    2: begin
+        instr_addr_o_cls1 ^= finj_fault << finj_index[9:5];
+        $display("Tx byte %c\n", finj_index[4:0]);
+       end
+    3: begin
+        data_req_o_cls1 ^= finj_fault;
+        $display("Tx byte %c\n", finj_index[4:0]);
+       end
+    4: begin
+        data_we_o_cls1 ^= finj_fault;
+        $display("Tx byte %c\n", finj_index[4:0]);
+       end
+    5: begin
+        data_be_o_cls1 ^= finj_fault << finj_index[9:5];
+        $display("Tx byte %c\n", finj_index[4:0]);
+      end
+    6: begin
+        data_addr_o_cls1 ^= finj_fault << finj_index[9:5];
+        $display("Tx byte %c\n", finj_index[4:0]);
+      end
+    7: begin
+        data_wdata_o_cls1 ^= finj_fault << finj_index[9:5];
+        $display("Tx byte %c\n", finj_index[4:0]);
+      end
+    8: begin
+       instr_req_o_cls2 ^= finj_fault;
+       $display("Tx byte %c\n", finj_index[4:0]);
+      end
+    9: begin
+       instr_addr_o_cls2 ^= finj_fault << finj_index[9:5];
+       $display("Tx byte %c\n", finj_index[4:0]);
+      end
+    10: begin
+       data_req_o_cls2 ^= finj_fault;
+       $display("Tx byte %c\n", finj_index[4:0]);
+      end
+    11: begin
+       data_we_o_cls2 ^= finj_fault;
+       $display("Tx byte %c\n", finj_index[4:0]);
+      end
+    12: begin
+       data_be_o_cls2 ^= finj_fault << finj_index[9:5];
+       $display("Tx byte %c\n", finj_index[4:0]);
+      end
+    13: begin
+       data_addr_o_cls2 ^= finj_fault << finj_index[9:5];
+       $display("Tx byte %c\n", finj_index[4:0]);
+      end
+    14: begin
+       data_wdata_o_cls2 ^= finj_fault << finj_index[9:5];
+       $display("Tx byte %c\n", finj_index[4:0]);
+      end
+  endcase
+end
 
-pseudo_random_gen cls_random_finj (
-  .clk(clk_i),
-  .rst(rst_ni),
+//pseudo_random_gen cls_random_finj (
+//  .clk(clk_i),
+//  .rst(rst_ni),
 
-  .fault(finj_fault),
-  .index(finj_index)
-);
+//  .fault(finj_fault),
+//  .index(finj_index)
+//);
 
 //------------------------------------------------------------------------------
 
