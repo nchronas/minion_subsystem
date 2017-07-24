@@ -128,7 +128,7 @@ RISCV_CORE_master
 
   .irq_i           ( irq_i             ),
 
-  .debug_req_i     ( debug_req_i       ),
+  //.debug_req_i     ( debug_req_i       ),
   .debug_gnt_o     ( debug_gnt_o       ),
   .debug_rvalid_o  ( debug_rvalid_o    ),
   .debug_addr_i    ( debug_addr_i      ),
@@ -260,26 +260,26 @@ always_comb begin
   case(finj_index[4:0])
     1: begin
         instr_req_o_cls1 ^= finj_fault;
-        $display("Tx byte %c\n", finj_index[4:0]);
+        $display("Tx byte %x\n", finj_index[4:0]);
        end
     2: begin
-        instr_addr_o_cls1 ^= finj_fault << finj_index[9:5];
-        $display("Tx byte %c\n", finj_index[4:0]);
+        instr_addr_o_cls1[7] ^= finj_fault;// << finj_index[9:5];
+        $display("Tx byte %x\n", finj_index[4:0]);
        end
     3: begin
         data_req_o_cls1 ^= finj_fault;
-        $display("Tx byte %c\n", finj_index[4:0]);
+        $display("Tx byte %x\n", finj_index[4:0]);
        end
-    4: begin
+     4: begin
+         data_addr_o_cls1[9] ^= finj_fault ;//<< finj_index[9:5];
+         $display("Tx byte %x\n", finj_index[4:0]);
+       end
+    5: begin
         data_we_o_cls1 ^= finj_fault;
         $display("Tx byte %c\n", finj_index[4:0]);
        end
-    5: begin
-        data_be_o_cls1 ^= finj_fault << finj_index[9:5];
-        $display("Tx byte %c\n", finj_index[4:0]);
-      end
     6: begin
-        data_addr_o_cls1 ^= finj_fault << finj_index[9:5];
+        data_be_o_cls1 ^= finj_fault << finj_index[9:5];
         $display("Tx byte %c\n", finj_index[4:0]);
       end
     7: begin
