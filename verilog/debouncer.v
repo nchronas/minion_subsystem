@@ -1,22 +1,22 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
+// Company:
+// Engineer:
+//
 // Create Date: 03/03/2015 09:08:56 PM
-// Design Name: 
+// Design Name:
 // Module Name: debouncer
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
+// Project Name:
+// Target Devices:
+// Tool Versions:
+// Description:
+//
+// Dependencies:
+//
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
-// 
+//
 //////////////////////////////////////////////////////////////////////////////////
 
 
@@ -27,11 +27,11 @@ module debouncer(
                  output reg O0,
                  output reg O1
                  );
-   
+
    reg [4:0]                cnt0, cnt1;
    reg                      Iv0=0,Iv1=0;
    reg                      out0, out1;
-   
+
    always@(posedge(clk))begin
       if (I0==Iv0)begin
          if (cnt0==19)O0<=I0;
@@ -50,5 +50,30 @@ module debouncer(
          Iv1<=I1;
       end
    end
-   
+
+endmodule
+
+module sw_state(
+                 input      clk,
+                 input      in,
+                 output reg out
+                 );
+
+   parameter RELEASED  = 1'b0,PRESSED = 1'b1 ;
+
+   reg  state = RELEASED;
+
+   always@(posedge(clk))begin
+      if (state == PRESSED)begin
+         if (in==0) begin
+            state <= RELEASED;
+            out <= 0;
+         end
+      end else begin
+         if (in==1) begin
+            state <= PRESSED;
+            out <= 1;
+         end
+      end
+   end
 endmodule

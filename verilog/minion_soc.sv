@@ -38,6 +38,8 @@ module minion_soc
  //input wire GPIO_SW_N,
  //input wire GPIO_SW_S
 
+ input wire [3:0] btn,
+
  input  logic       finj_fault,
  input  logic [9:0] finj_index
 
@@ -54,6 +56,56 @@ module minion_soc
  wire	   we_d;
  wire	   shared_sel;
  wire [31:0] 	   shared_rdata;
+
+ //----------------------------------------------------------------------------//
+ // finj from buttons
+ //-------------------------
+
+//wire       finj_fault;
+//wire [9:0] finj_index;
+// wire [3:0] dbtn;
+//
+// debouncer psb1_2(
+//   .clk(msoc_clk),
+//   .I0(btn[0]),
+//   .I1(btn[1]),
+//   .O0(dbtn[0]),
+//   .O1(dbtn[1])
+// );
+//
+// debouncer psb3_4(
+//   .clk(msoc_clk),
+//   .I0(btn[2]),
+//   .I1(btn[3]),
+//   .O0(dbtn[2]),
+//   .O1(dbtn[3])
+// );
+//
+// sw_state psb2(
+//   .clk(msoc_clk),
+//   .in(dbtn[0]),
+//   .out(finj_index[0])
+// );
+//
+// sw_state psb3(
+//   .clk(msoc_clk),
+//   .in(dbtn[1]),
+//   .out(finj_index[1])
+// );
+//
+// sw_state psb4(
+//   .clk(msoc_clk),
+//   .in(dbtn[2]),
+//   .out(finj_index[2])
+// );
+//
+// sw_state psb1(
+//   .clk(msoc_clk),
+//   .in(dbtn[3]),
+//   .out(finj_index[3])
+// );
+//
+assign finj_fault = (finj_index != 0);
 
 //----------------------------------------------------------------------------//
 // Core Instantiation

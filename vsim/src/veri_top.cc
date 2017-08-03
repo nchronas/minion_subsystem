@@ -134,9 +134,11 @@ int main(int argc, char** argv) {
           cout<<"No fault injection anymore"<<endl;
         } else {
           int fwire;
-          cout<<"Wire please: ";
-          cin>>fwire;
-          top->finj_index = (findex << 5 ) | fwire;
+          //printf("Wire value %x\n",top->minion_soc__DOT__RISCV_CORE__DOT__cls_assist__DOT__core_data_req);
+          //cout<<"Wire value "<<top->minion_soc->RISCV_CORE->cls_assist->data_req_ms<<endl;
+          //cout<<"Wire please: ";
+          //cin>>fwire;
+          top->finj_index = findex; // (findex << 5 ) | fwire;
           f_flag = 2;
           cout<<"Fault injection at index "<<findex<<endl;
         }

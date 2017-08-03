@@ -94,6 +94,36 @@ wire [31:0] data_wdata_o_cls2;
 // CPU Control Signals
 wire        core_busy_o_cls2;
 
+//Core slave 1
+// Instruction memory interface
+wire        instr_req_o_cls1_fj;
+wire [31:0] instr_addr_o_cls1_fj;
+
+// Data memory interface
+wire        data_req_o_cls1_fj;
+logic       data_we_o_cls1_fj;
+wire [3:0]  data_be_o_cls1_fj;
+wire [31:0] data_addr_o_cls1_fj;
+wire [31:0] data_wdata_o_cls1_fj;
+
+// CPU Control Signals
+wire        core_busy_o_cls1_fj;
+
+//Core slave 2
+// Instruction memory interface
+wire        instr_req_o_cls2_fj;
+wire [31:0] instr_addr_o_cls2_fj;
+
+// Data memory interface
+wire        data_req_o_cls2_fj;
+logic       data_we_o_cls2_fj;
+wire [3:0]  data_be_o_cls2_fj;
+wire [31:0] data_addr_o_cls2_fj;
+wire [31:0] data_wdata_o_cls2_fj;
+
+// CPU Control Signals
+wire        core_busy_o_cls2_fj;
+
 riscv_core
 #(
   .N_EXT_PERF_COUNTERS ( 0 )
@@ -101,7 +131,7 @@ riscv_core
 RISCV_CORE_master
 (
   .clk_i           ( clk_i             ),
-  .rst_ni          ( rst_ni            ),
+  .rst_ni          ( rst_cls            ),
 
   .clock_en_i      ( clock_en_i        ),
   .test_en_i       ( test_en_i         ),
@@ -152,7 +182,7 @@ riscv_core
 RISCV_CORE_slave_1
 (
   .clk_i           ( clk_i             ),
-  .rst_ni          ( rst_ni            ),
+  .rst_ni          ( rst_cls            ),
 
   .clock_en_i      ( clock_en_i        ),
   .test_en_i       ( test_en_i         ),
@@ -203,7 +233,7 @@ riscv_core
 RISCV_CORE_slave_2
 (
   .clk_i           ( clk_i             ),
-  .rst_ni          ( rst_ni            ),
+  .rst_ni          ( rst_cls            ),
 
   .clock_en_i      ( clock_en_i        ),
   .test_en_i       ( test_en_i         ),
@@ -256,66 +286,22 @@ RISCV_CORE_slave_2
 //wire       finj_fault;
 //wire [7:0] finj_index;
 
-always_comb begin
-  case(finj_index[4:0])
-    1: begin
-        instr_req_o_cls1 ^= finj_fault;
-        $display("Tx byte %x\n", finj_index[4:0]);
-       end
-    2: begin
-        instr_addr_o_cls1[7] ^= finj_fault;// << finj_index[9:5];
-        $display("Tx byte %x\n", finj_index[4:0]);
-       end
-    3: begin
-        data_req_o_cls1 ^= finj_fault;
-        $display("Tx byte %x\n", finj_index[4:0]);
-       end
-     4: begin
-         data_addr_o_cls1[9] ^= finj_fault ;//<< finj_index[9:5];
-         $display("Tx byte %x\n", finj_index[4:0]);
-       end
-    5: begin
-        data_we_o_cls1 ^= finj_fault;
-        $display("Tx byte %c\n", finj_index[4:0]);
-       end
-    6: begin
-        data_be_o_cls1 ^= finj_fault << finj_index[9:5];
-        $display("Tx byte %c\n", finj_index[4:0]);
-      end
-    7: begin
-        data_wdata_o_cls1 ^= finj_fault << finj_index[9:5];
-        $display("Tx byte %c\n", finj_index[4:0]);
-      end
-    8: begin
-       instr_req_o_cls2 ^= finj_fault;
-       $display("Tx byte %c\n", finj_index[4:0]);
-      end
-    9: begin
-       instr_addr_o_cls2 ^= finj_fault << finj_index[9:5];
-       $display("Tx byte %c\n", finj_index[4:0]);
-      end
-    10: begin
-       data_req_o_cls2 ^= finj_fault;
-       $display("Tx byte %c\n", finj_index[4:0]);
-      end
-    11: begin
-       data_we_o_cls2 ^= finj_fault;
-       $display("Tx byte %c\n", finj_index[4:0]);
-      end
-    12: begin
-       data_be_o_cls2 ^= finj_fault << finj_index[9:5];
-       $display("Tx byte %c\n", finj_index[4:0]);
-      end
-    13: begin
-       data_addr_o_cls2 ^= finj_fault << finj_index[9:5];
-       $display("Tx byte %c\n", finj_index[4:0]);
-      end
-    14: begin
-       data_wdata_o_cls2 ^= finj_fault << finj_index[9:5];
-       $display("Tx byte %c\n", finj_index[4:0]);
-      end
-  endcase
-end
+fault_injection_assist finj_assist (
+  .finj_fault(finj_fault),
+  .finj_index(finj_index),
+
+  .instr_req_cls1_i(instr_req_o_cls1),
+  .instr_addr_cls1_i(instr_addr_o_cls1),
+
+  .data_req_cls1_i(data_req_o_cls1),
+  .data_addr_cls1_i(data_addr_o_cls1),
+
+  .instr_req_cls1_o(instr_req_o_cls1_fj),
+  .instr_addr_cls1_o(instr_addr_o_cls1_fj),
+
+  .data_req_cls1_o(data_req_o_cls1_fj),
+  .data_addr_cls1_o(data_addr_o_cls1_fj)
+);
 
 //pseudo_random_gen cls_random_finj (
 //  .clk(clk_i),
@@ -327,11 +313,14 @@ end
 
 //------------------------------------------------------------------------------
 
+wire rst_cls;
+wire fault_cls;
+
 cls_cmp_unit cls_assist (
   .clk(clk_i),
-  .rst(rst_ni),
+  .rst(rst_cls),
 
-  .fault(),
+  .fault(fault_cls),
 
   .instr_req_ms(instr_req_o),
   .instr_addr_ms(instr_addr_o),
@@ -343,13 +332,13 @@ cls_cmp_unit cls_assist (
   .data_wdata_ms(data_wdata_o),
   .core_busy_ms(core_busy_o),
 
-  .instr_req_sl1(instr_req_o_cls1),
-  .instr_addr_sl1(instr_addr_o_cls1),
+  .instr_req_sl1(instr_req_o_cls1_fj),
+  .instr_addr_sl1(instr_addr_o_cls1_fj),
 
-  .data_req_sl1(data_req_o_cls1),
+  .data_req_sl1(data_req_o_cls1_fj),
   .data_we_sl1(data_we_o_cls1),
   .data_be_sl1(data_be_o_cls1),
-  .data_addr_sl1(data_addr_o_cls1),
+  .data_addr_sl1(data_addr_o_cls1_fj),
   .data_wdata_sl1(data_wdata_o_cls1),
   .core_busy_sl1(core_busy_o_cls1),
 
@@ -364,13 +353,13 @@ cls_cmp_unit cls_assist (
   .core_busy_sl2(core_busy_o_cls2)
 );
 
-//cls_handler_unit {
-//    .clk( clk ),
-//    .res_i( res ),
+cls_handler_unit cls_terminator (
+    .clk(clk_i),
+    .rst_i(rst_ni),
 
-//    .res_o( rst_ni ),
+    .rst_o(rst_cls),
 
-//    .fault ()
-//};
+    .fault(fault_cls)
+);
 
 endmodule
