@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2015 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="10" Path="/home/nanimo/Documents/repos/minion_subsystem/vivado/minion_top_arty.xpr">
+<Project Version="7" Minor="10" Path="/home/nanimo/Documents/repos/test_lowrisc/minion_subsystem/vivado/minion_top_arty.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="1326f0ed187148eca672250016af77c9"/>
@@ -20,8 +20,8 @@
     <Option Name="DefaultLib" Val="xil_defaultlib"/>
     <Option Name="EnableCoreContainer" Val="FALSE"/>
     <Option Name="CreateRefXciForCoreContainers" Val="FALSE"/>
-    <Option Name="IPUserFilesDir" Val="$PPRDIR/../../../../project_2/project_2.ip_user_files"/>
-    <Option Name="IPStaticSourceDir" Val="$PPRDIR/../../../../project_2/project_2.ip_user_files/ipstatic"/>
+    <Option Name="IPUserFilesDir" Val="$PPRDIR/../../../../../project_2/project_2.ip_user_files"/>
+    <Option Name="IPStaticSourceDir" Val="$PPRDIR/../../../../../project_2/project_2.ip_user_files/ipstatic"/>
     <Option Name="EnableBDX" Val="FALSE"/>
   </Configuration>
   <FileSets Version="1" Minor="31">
@@ -35,6 +35,20 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../pulpino/ips/riscv/alu_div.sv">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../verilog/sd_crc_7.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../verilog/sd_crc_16.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -118,6 +132,20 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../verilog/sd_data_serial_host.sv">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../verilog/sd_cmd_serial_host.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../pulpino/ips/riscv/ex_stage.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -167,14 +195,35 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../software/c_test/data.v">
+      <File Path="$PPRDIR/../verilog/ps2_keyboard.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../software/c_test/code.v">
+      <File Path="$PPRDIR/../verilog/ps2_translation_table.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../verilog/dualmem.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../verilog/rachelset.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../verilog/sd_top.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -222,6 +271,55 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../software/asm_test/code.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../software/asm_test/data.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../verilog/ps2.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../verilog/sd_bus.sv">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../verilog/Seg_7_Display.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../verilog/fstore2.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../verilog/sd_clock_divider.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../pulpino/rtl/includes/config.sv">
         <FileInfo SFType="VHeader">
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -235,17 +333,8 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../software/asm_test/data.v">
+      <File Path="$PPRDIR/srcs/top_arty.sv">
         <FileInfo>
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../software/asm_test/code.v">
-        <FileInfo>
-          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -261,7 +350,7 @@
       </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
-        <Option Name="TopModule" Val="minion_soc"/>
+        <Option Name="TopModule" Val="top_arty"/>
         <Option Name="TopAutoSet" Val="TRUE"/>
       </Config>
     </FileSet>
@@ -281,7 +370,7 @@
       <Filter Type="Srcs"/>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
-        <Option Name="TopModule" Val="minion_soc"/>
+        <Option Name="TopModule" Val="top_arty"/>
         <Option Name="TopLib" Val="xil_defaultlib"/>
         <Option Name="TopAutoSet" Val="TRUE"/>
         <Option Name="SimMode" Val="post-implementation"/>
@@ -295,22 +384,21 @@
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
+        <CompFileExtendedInfo CompFileName="clk_wiz_arty_0.xci" FileRelPathName="clk_wiz_arty_0.xml"/>
+        <CompFileExtendedInfo CompFileName="clk_wiz_arty_0.xci" FileRelPathName="clk_wiz_arty_0_ooc.xdc"/>
+        <CompFileExtendedInfo CompFileName="clk_wiz_arty_0.xci" FileRelPathName="clk_wiz_arty_0.xdc"/>
+        <CompFileExtendedInfo CompFileName="clk_wiz_arty_0.xci" FileRelPathName="clk_wiz_arty_0.v"/>
+        <CompFileExtendedInfo CompFileName="clk_wiz_arty_0.xci" FileRelPathName="doc/clk_wiz_v5_2_changelog.txt"/>
+        <CompFileExtendedInfo CompFileName="clk_wiz_arty_0.xci" FileRelPathName="clk_wiz_arty_0_board.xdc"/>
+        <CompFileExtendedInfo CompFileName="clk_wiz_arty_0.xci" FileRelPathName="clk_wiz_arty_0.veo"/>
+        <CompFileExtendedInfo CompFileName="clk_wiz_arty_0.xci" FileRelPathName="clk_wiz_arty_0_clk_wiz.v"/>
+        <CompFileExtendedInfo CompFileName="clk_wiz_arty_0.xci" FileRelPathName="clk_wiz_arty_0_stub.vhdl"/>
+        <CompFileExtendedInfo CompFileName="clk_wiz_arty_0.xci" FileRelPathName="clk_wiz_arty_0_sim_netlist.vhdl"/>
+        <CompFileExtendedInfo CompFileName="clk_wiz_arty_0.xci" FileRelPathName="clk_wiz_arty_0_sim_netlist.v"/>
+        <CompFileExtendedInfo CompFileName="clk_wiz_arty_0.xci" FileRelPathName="clk_wiz_arty_0_stub.v"/>
       </File>
       <Config>
         <Option Name="TopModule" Val="clk_wiz_arty_0"/>
-        <Option Name="UseBlackboxStub" Val="1"/>
-      </Config>
-    </FileSet>
-    <FileSet Name="ila_arty_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/ila_arty_0">
-      <File Path="$PPRDIR/srcs/ip/ila_arty_0/ila_arty_0.xci">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <Config>
-        <Option Name="TopModule" Val="ila_arty_0"/>
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
@@ -351,14 +439,7 @@
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
     </Run>
-    <Run Id="ila_arty_0_synth_1" Type="Ft3:Synth" SrcSet="ila_arty_0" Part="xc7a35ticsg324-1L" ConstrsSet="ila_arty_0" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/ila_arty_0_synth_1" IncludeInArchive="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2015"/>
-        <Step Id="synth_design"/>
-      </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
-    </Run>
-    <Run Id="impl_1" Type="Ft2:EntireDesign" Part="xc7a35ticsg324-1L" ConstrsSet="constrs_1" Description="Vivado Implementation Defaults" State="current" Dir="$PRUNDIR/impl_1" SynthRun="synth_1" IncludeInArchive="true">
+    <Run Id="impl_1" Type="Ft2:EntireDesign" Part="xc7a35ticsg324-1L" ConstrsSet="constrs_1" Description="Vivado Implementation Defaults" State="current" SynthRun="synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2015"/>
         <Step Id="init_design"/>
@@ -373,23 +454,8 @@
           <Option Id="BinFile">1</Option>
         </Step>
       </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
     </Run>
     <Run Id="clk_wiz_arty_0_impl_1" Type="Ft2:EntireDesign" Part="xc7a35ticsg324-1L" ConstrsSet="clk_wiz_arty_0" Description="Vivado Implementation Defaults" SynthRun="clk_wiz_arty_0_synth_1" IncludeInArchive="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2015"/>
-        <Step Id="init_design"/>
-        <Step Id="opt_design"/>
-        <Step Id="power_opt_design"/>
-        <Step Id="place_design"/>
-        <Step Id="post_place_power_opt_design"/>
-        <Step Id="phys_opt_design"/>
-        <Step Id="route_design"/>
-        <Step Id="post_route_phys_opt_design"/>
-        <Step Id="write_bitstream"/>
-      </Strategy>
-    </Run>
-    <Run Id="ila_arty_0_impl_1" Type="Ft2:EntireDesign" Part="xc7a35ticsg324-1L" ConstrsSet="ila_arty_0" Description="Vivado Implementation Defaults" SynthRun="ila_arty_0_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2015"/>
         <Step Id="init_design"/>
