@@ -33,7 +33,11 @@ module top_arty(
     input wire        uart_txd_in,
     
     // pusb button array
-    input [3:0] btn
+    input wire [3:0]  btn,
+    input wire [3:0]  sw,
+
+
+    output wire [11:0] rgb_led
 
 );
     
@@ -44,7 +48,7 @@ module top_arty(
      .clk_out2    ( msoc_clk      ), // 25 MHz (for minion SOC)
      .clk_out3    ( pxl_clk       ),
       // Status and control signals
-        .reset      ( ck_rst       ),
+        .reset      ( !ck_rst       ),
         .locked      ( clk_locked    )
         );
   
@@ -52,10 +56,19 @@ module top_arty(
        msoc (
            .clk_200MHz (clk_200MHz),
            .msoc_clk(msoc_clk),
+           .pxl_clk(pxl_clk),
+
+           .rstn(clk_locked),
            
+           .uart_tx(uart_rxd_out),
+           .uart_rx(uart_txd_in),
+
+           .to_led(rgb_led[7:0]),
+           .from_dip(btn),
+           .GPIO_SW_N(sw[0]),
+           .GPIO_SW_E(sw[1]),
+           .GPIO_SW_W(sw[2]),
+           .GPIO_SW_S(sw[3])
            
-           .from_dip(i_dip),
-           .to_led(o_led),
-           .rstn(clk_locked)
   );
 endmodule
